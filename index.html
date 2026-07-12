@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartEFD AI Bridge — Mamlaka ya Mapato Tanzania</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g900:#003D1A;--g700:#005C2B;--g500:#007A38;--g200:#A8D5B8;--g100:#E8F5EE;--g50:#F4FAF6;
+  --b900:#002060;--b700:#003580;--b100:#E8F0FB;
+  --gold:#FFB81C;--white:#FFFFFF;--text:#1A2E1A;--muted:#4A6B50;--border:#C8E0D0;
+}
+body{background:#F0F4F1;color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif;min-height:100vh;font-size:14px}
+.gov-bar{background:var(--g900);padding:5px 24px;display:flex;align-items:center;gap:10px}
+.gov-bar span{font-size:10px;color:var(--g200);letter-spacing:.5px}
+.hdr{background:linear-gradient(135deg,var(--g700),var(--b900));border-bottom:4px solid var(--gold);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hdr-logo{display:flex;align-items:center;gap:14px}
+.logo-em{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.hdr-text h1{font-size:17px;font-weight:800;color:#fff}
+.hdr-text .sub{font-size:10px;color:var(--g200);letter-spacing:1px;margin-top:2px;font-weight:600}
+.hdr-text .eng{font-size:10px;color:rgba(255,255,255,.6);margin-top:1px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.api-pill{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.15);border-radius:100px;padding:4px 11px;font-size:10px;color:rgba(255,255,255,.8)}
+.dot{width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;transition:background .3s}
+.dot.on{background:#4ADE80;animation:blink 2.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.motto{font-size:9px;color:var(--gold);font-style:italic}
+.nav-strip{background:var(--g700);padding:0 24px;display:flex;align-items:center;border-bottom:1px solid var(--g500);overflow-x:auto}
+.nav-item{font-size:11px;color:rgba(255,255,255,.65);padding:10px 16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;transition:color .15s;user-select:none;flex-shrink:0}
+.nav-item:hover{color:rgba(255,255,255,.9)}
+.nav-item.active{color:#fff;border-bottom-color:var(--gold);font-weight:700}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 20px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-head{background:var(--g50);border-bottom:2px solid var(--g200);padding:12px 18px;display:flex;align-items:center;gap:8px}
+.card-head-icon{font-size:16px}
+.card-head-title{font-size:11px;font-weight:800;color:var(--g700);letter-spacing:1px;text-transform:uppercase}
+.card-head-sub{font-size:9px;color:var(--muted);margin-left:auto}
+.card-body{padding:18px}
+.fg{margin-bottom:14px}
+label{display:block;font-size:10px;font-weight:700;color:var(--g700);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}
+label .sw{color:var(--muted);font-style:italic;font-weight:400}
+input,select{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:var(--g500);box-shadow:0 0 0 3px rgba(0,122,56,.1)}
+select option{background:var(--white)}
+.btn-main{width:100%;padding:11px;background:linear-gradient(135deg,var(--g700),var(--b700));border:none;border-radius:6px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.btn-main:hover{opacity:.9}.btn-main:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:4px}
+.btn-sec{padding:11px 13px;background:transparent;border:1.5px solid var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer}
+.btn-sec:hover{border-color:var(--g500);color:var(--g700)}
+.terminal{background:#0F1F10;border:1px solid var(--g200);border-radius:6px;padding:11px 13px;font-family:'Courier New',monospace;font-size:11px;color:#4ADE80;max-height:110px;overflow-y:auto;margin-top:13px;display:none}
+.tl{margin-bottom:2px;line-height:1.5}.tl::before{content:'$ ';color:#2E7D32;opacity:.6}
+.tl.ok{color:#4ADE80}.tl.ok::before{content:'✓ ';opacity:1}
+.tl.err{color:#F87171}.tl.err::before{content:'✗ ';opacity:1}
+.tl.ch{color:#60A5FA}.tl.ch::before{content:'⛓ ';opacity:1}
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center}
+.ph-seal{font-size:40px;margin-bottom:12px;opacity:.25}
+.ph-text{font-size:12px;color:var(--muted);line-height:1.8}.ph-text strong{color:var(--g700)}
+.receipt-header{background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:10px 14px;margin-bottom:16px}
+.receipt-num{font-family:'Courier New',monospace;font-size:10px;color:var(--muted);margin-bottom:3px}
+.receipt-id{font-family:'Courier New',monospace;font-size:12px;color:var(--g700);font-weight:700;word-break:break-all}
+.info-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.info-chip{background:var(--g50);border:1px solid var(--g200);border-radius:4px;padding:4px 10px;font-size:11px;color:var(--g700)}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.stat{background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:9px;text-align:center}
+.stat-val{font-size:20px;font-weight:900;color:var(--g700)}
+.stat-lbl{font-size:8px;color:var(--muted);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+.score-section{margin-bottom:16px}
+.score-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.score-num{font-size:48px;font-weight:900;line-height:1;transition:color .4s}
+.score-denom{font-size:11px;color:var(--muted)}
+.score-track{height:8px;background:#E5E7EB;border-radius:10px;overflow:hidden}
+.score-fill{height:100%;border-radius:10px;width:0%;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.verdict{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:4px;border-left:4px solid;font-size:13px;font-weight:800;margin-bottom:16px;width:100%}
+.bk-label-row{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px;padding-bottom:6px;border-bottom:2px solid var(--g200)}
+.bk-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F0F4F1}
+.bk-item:last-child{border-bottom:none}
+.bk-label{font-size:11px;color:var(--muted);flex:1}
+.bk-track{width:80px;height:5px;background:#E5E7EB;border-radius:4px;overflow:hidden;flex-shrink:0}
+.bk-fill{height:100%;border-radius:4px;background:var(--g500)}
+.bk-pts{font-size:11px;font-weight:700;color:var(--text);width:38px;text-align:right;flex-shrink:0}
+.chain-section{margin-top:16px;padding-top:16px;border-top:2px solid var(--g100)}
+.chain-btn{width:100%;padding:10px 14px;background:transparent;border:1.5px solid var(--b700);border-radius:6px;color:var(--b700);font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.chain-btn:hover{background:var(--b100)}.chain-btn:disabled{opacity:.4;cursor:not-allowed}
+.chain-status{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.7;padding:8px 12px;background:var(--b100);border-radius:5px;display:none}
+.chain-status a{color:var(--b700);text-decoration:none;font-weight:700}
+.qr-section{margin-top:16px;padding-top:16px;border-top:2px solid var(--g100);display:none}
+.qr-wrap{display:flex;gap:16px;align-items:flex-start;background:var(--g50);border:1px solid var(--g200);border-radius:8px;padding:14px}
+.qr-box{background:white;padding:8px;border-radius:6px;border:2px solid var(--g200);flex-shrink:0}
+.qr-info{flex:1}
+.qr-title{font-size:10px;font-weight:800;color:var(--g700);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.qr-url{font-family:'Courier New',monospace;font-size:9px;color:var(--muted);word-break:break-all;margin-bottom:10px;line-height:1.5}
+.qr-verify-btn{display:inline-block;padding:7px 14px;background:var(--g700);color:white;border-radius:4px;font-size:11px;font-weight:700;text-decoration:none}
+.page-head{margin-bottom:18px}
+.page-head h2{font-size:16px;font-weight:800;color:var(--g700);margin-bottom:4px}
+.page-head p{font-size:12px;color:var(--muted)}
+.refresh-btn{padding:8px 16px;background:var(--g700);color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--g50);border-bottom:2px solid var(--g200)}
+th{padding:10px 12px;text-align:left;font-size:9px;font-weight:800;color:var(--g700);letter-spacing:1px;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #F0F4F1;transition:background .1s}
+tbody tr:hover{background:var(--g50)}
+td{padding:10px 12px;color:var(--text)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700}
+.badge-ok{background:#E8F5EE;color:var(--g700)}
+.badge-warn{background:#FFF3CD;color:#7A5500}
+.badge-danger{background:#FEF2F2;color:#991B1B}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:12px}
+.empty-state .ei{font-size:32px;margin-bottom:10px}
+.chain-rec{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.chain-rec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.chain-rec-id{font-family:'Courier New',monospace;font-size:11px;color:var(--g700);font-weight:700;word-break:break-all}
+.chain-rec-block{font-size:10px;color:var(--muted);white-space:nowrap}
+.chain-rec-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chain-rec-chip{background:var(--g50);border:1px solid var(--g200);border-radius:4px;padding:3px 9px;font-size:10px;color:var(--g700)}
+.chain-rec-link{font-size:11px;color:var(--b700);text-decoration:none;font-weight:700}
+.chain-rec-link:hover{text-decoration:underline}
+.verify-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.v-result{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:12px}
+.v-stamp{padding:24px;text-align:center;border-bottom:1px solid var(--border)}
+.v-icon{font-size:44px;margin-bottom:10px}
+.v-title{font-size:20px;font-weight:900;margin-bottom:4px}
+.v-sub{font-size:12px;color:var(--muted);line-height:1.6}
+.v-body{padding:18px}
+.v-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0F4F1;font-size:12px}
+.v-row:last-child{border-bottom:none}
+.v-lbl{color:var(--muted)}
+.v-val{font-weight:600;text-align:right;word-break:break-all;max-width:65%}
+.eat-badge{display:inline-flex;align-items:center;gap:5px;background:var(--g700);color:white;border-radius:4px;padding:3px 10px;font-family:'Courier New',monospace;font-size:10px;font-weight:700}
+.hash-box{background:#F8FAF9;border:1px solid var(--g200);border-radius:6px;padding:10px;font-family:'Courier New',monospace;font-size:10px;color:var(--muted);word-break:break-all;line-height:1.6;margin:10px 0}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,0,0,.15);border-top-color:currentColor;border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{background:var(--g900);color:var(--g200);text-align:center;padding:12px 20px;font-size:10px;margin-top:24px}
+.footer strong{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div class="gov-bar">
+  <span>🇹🇿</span>
+  <span>JAMHURI YA MUUNGANO WA TANZANIA &nbsp;·&nbsp; UNITED REPUBLIC OF TANZANIA</span>
+</div>
+
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="logo-em">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <line x1="16" y1="4" x2="16" y2="28" stroke="white" stroke-width="2.2"/>
+        <line x1="8"  y1="28" x2="24" y2="28" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="16" y1="10" x2="6"  y2="14" stroke="white" stroke-width="2"/>
+        <line x1="16" y1="10" x2="26" y2="14" stroke="white" stroke-width="2"/>
+        <path d="M3 14 Q6 21 9 14"   fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <path d="M23 14 Q26 21 29 14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="8" r="2.8" fill="white"/>
+      </svg>
+    </div>
+    <div class="hdr-text">
+      <h1>SmartEFD AI Bridge</h1>
+      <div class="sub">MAMLAKA YA MAPATO TANZANIA — MFUMO WA EFD YENYE AKILI BANDIA</div>
+      <div class="eng">Tanzania Revenue Authority · Innovation Challenge 2026</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="api-pill"><div class="dot" id="dot"></div><span id="statusTxt">Inaangalia...</span></div>
+    <div class="motto">"Pamoja Tunajenga Taifa Letu"</div>
+  </div>
+</div>
+
+<div class="nav-strip">
+  <div class="nav-item active"  onclick="showTab('tuma',this)">📋 Tuma Risiti</div>
+  <div class="nav-item" onclick="showTab('ripoti',this)">📊 Ripoti za Hatari</div>
+  <div class="nav-item" onclick="showTab('rekodi',this)">⛓️ Rekodi za Blockchain</div>
+  <div class="nav-item" onclick="showTab('thibitisha',this)">🔍 Thibitisha QR</div>
+</div>
+
+<!-- TAB 1: TUMA RISITI -->
+<div id="tab-tuma" class="tab-panel active">
+<div class="wrap"><div class="two-col">
+  <div class="card">
+    <div class="card-head"><span class="card-head-icon">📋</span><span class="card-head-title">Tuma Risiti ya EFD</span><span class="card-head-sub">Issue EFD Receipt</span></div>
+    <div class="card-body">
+      <div class="fg"><label>Nambari ya Utambulisho (UIN) <span class="sw">/ Business UIN</span></label><input id="uin" type="text" value="TRA-DAR-001"></div>
+      <div class="fg"><label>Kiasi (TZS) <span class="sw">/ Amount</span></label><input id="amount" type="number" value="15000" min="0"></div>
+      <div class="fg"><label>Aina ya Bidhaa <span class="sw">/ Category</span></label>
+        <select id="cat">
+          <option value="food">🥗 Chakula / Food</option>
+          <option value="clothing">👕 Mavazi / Clothing</option>
+          <option value="agriculture">🌾 Kilimo / Agriculture</option>
+          <option value="services">🔧 Huduma / Services</option>
+          <option value="electronics">📱 Elektroniki / Electronics</option>
+          <option value="fuel">⛽ Mafuta / Fuel</option>
+          <option value="liquor">🍶 Pombe / Liquor</option>
+        </select>
+      </div>
+      <div class="fg"><label>Kitambulisho cha Mkahala <span class="sw">/ Cashier ID</span></label><input id="cashier" type="text" value="CASHIER-A"></div>
+      <div class="btn-row">
+        <button class="btn-main" id="submitBtn" onclick="issueReceipt()">Tuma Risiti &amp; Changanua Hatari →</button>
+        <button class="btn-sec" onclick="resetForm()">↺</button>
+      </div>
+      <div class="terminal" id="terminal"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-head-icon">🤖</span><span class="card-head-title">Uchambuzi wa Hatari</span><span class="card-head-sub">AI Risk Analysis</span></div>
+    <div class="card-body">
+      <div class="placeholder" id="placeholder">
+        <div class="ph-seal">🛡️</div>
+        <div class="ph-text">Jaza fomu upande wa kushoto<br>kisha bonyeza <strong>Tuma Risiti</strong><br>ili kuona uchambuzi wa hatari hapa.</div>
+      </div>
+      <div id="results" style="display:none">
+        <div class="receipt-header"><div class="receipt-num">NAMBARI YA RISITI / RECEIPT ID</div><div class="receipt-id" id="receiptId">—</div></div>
+        <div class="info-row">
+          <div class="info-chip">UIN: <strong id="rUin">—</strong></div>
+          <div class="info-chip">TZS <strong id="rAmount">—</strong></div>
+          <div class="info-chip" id="rCatChip">—</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-val" id="statScore">—</div><div class="stat-lbl">Alama za Hatari</div></div>
+          <div class="stat"><div class="stat-val" id="statCount">—</div><div class="stat-lbl">Risiti Namba</div></div>
+          <div class="stat"><div class="stat-val" id="statChain">⏳</div><div class="stat-lbl">Blockchain</div></div>
+        </div>
+        <div class="score-section">
+          <div class="score-top"><span class="score-num" id="scoreNum">0</span><span class="score-denom">/ 100 — Alama za Hatari</span></div>
+          <div class="score-track"><div class="score-fill" id="scoreBar"></div></div>
+        </div>
+        <div id="verdictBadge" class="verdict"></div>
+        <div class="bk-label-row">Maelezo ya Alama / Score Breakdown</div>
+        <div id="breakdown"></div>
+        <div class="chain-section">
+          <div class="bk-label-row" style="margin-top:4px">Rekodi ya Blockchain</div>
+          <button class="chain-btn" id="chainBtn" onclick="sendToBlockchain()">⛓️ Hifadhi kwenye Avalanche Fuji →</button>
+          <div class="chain-status" id="chainStatus"></div>
+        </div>
+        <div class="qr-section" id="qrSection">
+          <div class="bk-label-row">Msimbo wa QR / QR Code</div>
+          <div class="qr-wrap">
+            <div class="qr-box" id="qrCanvas"></div>
+            <div class="qr-info">
+              <div class="qr-title">🔍 Thibitisha Risiti</div>
+              <div class="qr-url" id="qrUrl">—</div>
+              <a class="qr-verify-btn" id="verifyLink" href="#" target="_blank">🔍 Fungua Ukurasa wa Uthibitisho ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+</div>
+
+<!-- TAB 2: RIPOTI ZA HATARI -->
+<div id="tab-ripoti" class="tab-panel">
+<div class="wrap">
+  <div class="page-head"><h2>📊 Ripoti za Hatari / Risk Reports</h2><p>Biashara zote na hali zao za hatari / All businesses and their risk profiles</p></div>
+  <button class="refresh-btn" onclick="loadRiskReports()">↻ Sasisha / Refresh</button>
+  <div class="card"><div id="riskTableWrap"><div class="empty-state"><div class="ei">📊</div><p>Bonyeza Sasisha kupata ripoti<br>Click Refresh to load risk reports</p></div></div></div>
+</div>
+</div>
+
+<!-- TAB 3: REKODI ZA BLOCKCHAIN -->
+<div id="tab-rekodi" class="tab-panel">
+<div class="wrap">
+  <div class="page-head"><h2>⛓️ Rekodi za Blockchain / Blockchain Records</h2><p>Risiti zilizohifadhiwa kwenye Avalanche Fuji katika kipindi hiki / Receipts recorded on-chain this session</p></div>
+  <div id="chainRecordsList">
+    <div class="empty-state card" style="padding:40px 20px">
+      <div class="ei">⛓️</div>
+      <p>Hakuna rekodi za blockchain bado.<br>No blockchain records yet this session.<br><br>
+      Nenda <strong>Tuma Risiti</strong> → tuma risiti → bonyeza <strong>Hifadhi kwenye Avalanche Fuji</strong></p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 4: THIBITISHA QR -->
+<div id="tab-thibitisha" class="tab-panel">
+<div class="wrap">
+  <div class="page-head"><h2>🔍 Thibitisha Risiti / Verify Receipt</h2><p>Ingiza nambari ya risiti kuthibitisha uhalisi wake kwenye blockchain</p></div>
+  <div class="verify-box">
+    <div class="fg"><label>Nambari ya Risiti <span class="sw">/ Receipt ID</span></label><input id="verifyInput" type="text" placeholder="e.g. EFD-TZ-1783758566811"></div>
+    <button class="btn-main" id="verifyBtn" onclick="verifyManual()" style="max-width:320px">🔍 Thibitisha kwenye Blockchain →</button>
+  </div>
+  <div id="verifyResult"></div>
+</div>
+</div>
+
+<div class="footer">
+  <strong>SmartEFD AI Bridge</strong> &nbsp;·&nbsp; Mamlaka ya Mapato Tanzania (TRA) · Innovation Challenge 2026 &nbsp;·&nbsp; Avalanche C-Chain · <strong>tra.go.tz</strong>
+</div>
+
+<script>
+const API = window.location.origin;
+const RISK = {
+  LOW:      {bar:'#007A38',border:'#007A38',bg:'#E8F5EE',text:'#004D20',icon:'✅',sw:'CHINI'},
+  MEDIUM:   {bar:'#D97706',border:'#D97706',bg:'#FFFBEB',text:'#7A4500',icon:'⚠️',sw:'WASTANI'},
+  HIGH:     {bar:'#C2410C',border:'#C2410C',bg:'#FFF7ED',text:'#7C2D12',icon:'🔶',sw:'JUU'},
+  CRITICAL: {bar:'#991B1B',border:'#991B1B',bg:'#FEF2F2',text:'#7F1D1D',icon:'🚨',sw:'HATARI KUBWA'},
+};
+let currentReceiptId=null, qrGenerated=false, blockchainRecords=[];
+
+function toEAT(unixTs){
+  const ms=unixTs?unixTs*1000:Date.now();
+  const eat=new Date(ms+3*3600*1000);
+  const p=n=>String(n).padStart(2,'0');
+  const days=['Jumapili','Jumatatu','Jumanne','Jumatano','Alhamisi','Ijumaa','Jumamosi'];
+  return `${eat.getUTCFullYear()}-${p(eat.getUTCMonth()+1)}-${p(eat.getUTCDate())} ${p(eat.getUTCHours())}:${p(eat.getUTCMinutes())}:${p(eat.getUTCSeconds())} EAT (${days[eat.getUTCDay()]})`;
+}
+
+function showTab(name,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='ripoti') loadRiskReports();
+  if(name==='rekodi') renderChainRecords();
+}
+
+async function checkAPI(){
+  try{
+    const r=await fetch(API+'/health',{signal:AbortSignal.timeout(3000)});
+    if(r.ok){document.getElementById('dot').classList.add('on');document.getElementById('statusTxt').textContent='API Inaendesha';}
+  }catch{document.getElementById('dot').classList.remove('on');document.getElementById('statusTxt').textContent='API Haipatikani';}
+}
+checkAPI();setInterval(checkAPI,9000);
+
+function logClear(){const t=document.getElementById('terminal');t.innerHTML='';t.style.display='none';}
+function log(msg,cls=''){
+  const t=document.getElementById('terminal');t.style.display='block';
+  const d=document.createElement('div');d.className='tl'+(cls?' '+cls:'');d.textContent=msg;
+  t.appendChild(d);t.scrollTop=t.scrollHeight;
+}
+
+async function issueReceipt(){
+  const uin=document.getElementById('uin').value.trim();
+  const amount=parseFloat(document.getElementById('amount').value);
+  const cat=document.getElementById('cat').value;
+  const cashier=document.getElementById('cashier').value.trim();
+  if(!uin||!amount||!cashier){alert('Tafadhali jaza sehemu zote');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Inachanganua...';
+  logClear();log(`UIN: ${uin} | TZS: ${amount.toLocaleString()} | ${cat}`);log('Inatuma kwa Flask API...');
+  try{
+    const resp=await fetch(API+'/receipt',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({business_uin:uin,amount_tzs:amount,item_category:cat,cashier_id:cashier})});
+    const data=await resp.json();
+    if(resp.status===201){
+      log(`Risiti: ${data.receipt_id}`,'ok');log(`Alama: ${data.risk_score}/100 — ${data.risk_flag}`,'ok');
+      log('Imehifadhiwa kwenye history','ok');
+      currentReceiptId=data.receipt_id;qrGenerated=false;renderResult(data,cat);
+    }else{log(`Hitilafu: ${data.error||'?'}`,'err');}
+  }catch(e){log(`Haiwezi kufikia API: ${e.message}`,'err');}
+  btn.disabled=false;btn.innerHTML='Tuma Risiti &amp; Changanua Hatari →';
+}
+
+function renderResult(data,cat){
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('results').style.display='block';
+  document.getElementById('qrSection').style.display='none';
+  document.getElementById('receiptId').textContent=data.receipt_id;
+  document.getElementById('rUin').textContent=data.business_uin;
+  document.getElementById('rAmount').textContent=Number(data.amount_tzs).toLocaleString();
+  document.getElementById('rCatChip').textContent=cat.charAt(0).toUpperCase()+cat.slice(1);
+  document.getElementById('statScore').textContent=data.risk_score;
+  document.getElementById('statCount').textContent='#'+data.receipt_count;
+  document.getElementById('statChain').textContent='⏳';document.getElementById('statChain').style.color='';
+  const score=data.risk_score;
+  const vKey=['CRITICAL','HIGH','MEDIUM','LOW'].find(k=>data.risk_flag.includes(k))||'LOW';
+  const rc=RISK[vKey];
+  document.getElementById('scoreNum').textContent=score;document.getElementById('scoreNum').style.color=rc.bar;
+  document.getElementById('scoreBar').style.background=rc.bar;
+  setTimeout(()=>{document.getElementById('scoreBar').style.width=score+'%';},60);
+  const badge=document.getElementById('verdictBadge');
+  badge.style.cssText=`background:${rc.bg};border-left-color:${rc.border};color:${rc.text};margin-bottom:16px`;
+  badge.innerHTML=`${rc.icon} <span style="font-size:14px">${rc.sw}</span> <span style="font-weight:400;font-size:12px">— ${data.risk_flag}</span>`;
+  const d=data.risk_detail;
+  document.getElementById('breakdown').innerHTML=[
+    {label:'Kiasi / Amount',pts:d.amount_pts,max:40},
+    {label:'Aina / Category',pts:d.category_pts,max:20},
+    {label:'Muda / Time',pts:d.time_pts,max:20},
+    {label:'Upungufu / Missing',pts:d.missing_pts,max:20},
+  ].map(r=>`<div class="bk-item"><span class="bk-label">${r.label}</span>
+    <div class="bk-track"><div class="bk-fill" style="width:${r.max?(r.pts/r.max*100):0}%"></div></div>
+    <span class="bk-pts">${r.pts} pts</span></div>`).join('');
+  const cb=document.getElementById('chainBtn');
+  cb.disabled=false;cb.textContent='⛓️ Hifadhi kwenye Avalanche Fuji →';
+  cb.style.borderColor='var(--b700)';cb.style.color='var(--b700)';
+  const cs=document.getElementById('chainStatus');cs.style.display='none';cs.textContent='';
+}
+
+async function sendToBlockchain(){
+  if(!currentReceiptId)return;
+  const btn=document.getElementById('chainBtn'),cs=document.getElementById('chainStatus');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Inatuma kwenye Avalanche...';
+  cs.style.display='block';cs.textContent='Inasaini muamala...';
+  log('','ch');log('Inaunda SHA-256 hash...','ch');log('Inasubiri uthibitishaji (10-30s)...','ch');
+  try{
+    const resp=await fetch(API+'/receipt/onchain',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({receipt_id:currentReceiptId})});
+    const data=await resp.json();
+    if(data.success){
+      const eatTime=toEAT(data.block_timestamp||null);
+      log(`Block: ${data.block_number} · EAT: ${eatTime}`,'ok');
+      log(`TX: ${String(data.tx_hash).substring(0,22)}...`,'ok');
+      document.getElementById('statChain').textContent='✅';document.getElementById('statChain').style.color='#007A38';
+      btn.innerHTML='✅ Imehifadhiwa Kwenye Blockchain';btn.style.borderColor='#007A38';btn.style.color='#007A38';
+      cs.style.display='block';
+      cs.innerHTML=`<strong style="color:var(--text)">Imefanikiwa ✅</strong><br>
+        🧱 Block: <strong>${data.block_number}</strong><br>
+        🕐 Muda (EAT): <strong>${eatTime}</strong><br>
+        🔗 <a href="${data.snowtrace_url}" target="_blank">Angalia SnowTrace ↗</a>`;
+      blockchainRecords.unshift({
+        receiptId:currentReceiptId,
+        uin:document.getElementById('rUin').textContent,
+        amount:document.getElementById('rAmount').textContent,
+        cat:document.getElementById('rCatChip').textContent,
+        block:data.block_number,eatTime:eatTime,
+        txHash:data.tx_hash,snowtrace:data.snowtrace_url
+      });
+      generateQR(currentReceiptId);
+    }else{
+      log(`Hitilafu: ${data.error}`,'err');
+      btn.disabled=false;btn.textContent='⛓️ Jaribu Tena →';
+      cs.style.display='block';cs.textContent='Hitilafu: '+(data.error||'Muamala ulikataliwa');
+    }
+  }catch(e){
+    log(`Ombi limeshindwa: ${e.message}`,'err');
+    btn.disabled=false;btn.textContent='⛓️ Hifadhi kwenye Avalanche Fuji →';cs.style.display='none';
+  }
+}
+
+function generateQR(receiptId){
+  if(qrGenerated)return;qrGenerated=true;
+  const verifyUrl=`${API}/verify.html?id=${receiptId}`;
+  document.getElementById('qrUrl').textContent=verifyUrl;
+  document.getElementById('verifyLink').href=`/verify.html?id=${receiptId}`;
+  document.getElementById('qrSection').style.display='block';
+  document.getElementById('qrCanvas').innerHTML='';
+  new QRCode(document.getElementById('qrCanvas'),{text:verifyUrl,width:120,height:120,colorDark:'#005C2B',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.H});
+}
+
+function resetForm(){
+  document.getElementById('uin').value='TRA-DAR-001';document.getElementById('amount').value='15000';
+  document.getElementById('cat').value='food';document.getElementById('cashier').value='CASHIER-A';
+  logClear();document.getElementById('placeholder').style.display='flex';
+  document.getElementById('results').style.display='none';document.getElementById('qrSection').style.display='none';
+  currentReceiptId=null;qrGenerated=false;
+}
+
+async function loadRiskReports(){
+  document.getElementById('riskTableWrap').innerHTML='<div class="empty-state"><div class="ei">⏳</div><p>Inapakia data...</p></div>';
+  try{
+    const resp=await fetch(API+'/summary');
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const data=await resp.json();
+    if(!data.length){
+      document.getElementById('riskTableWrap').innerHTML='<div class="empty-state"><div class="ei">📭</div><p>Hakuna rekodi bado.<br>Submit receipts on the Tuma Risiti tab first.</p></div>';
+      return;
+    }
+    const rows=data.map(b=>{
+      const hr=b.high_risk_count||0;
+      const badge=hr>=2?`<span class="badge badge-danger">🚨 Chunguza</span>`:hr>=1?`<span class="badge badge-warn">⚠️ Angalia</span>`:`<span class="badge badge-ok">✅ Kawaida</span>`;
+      return `<tr><td><strong>${b.uin}</strong></td><td>${b.total_receipts}</td>
+        <td>TZS ${Number(b.avg_amount_tzs).toLocaleString()}</td>
+        <td>TZS ${Number(b.max_amount_tzs).toLocaleString()}</td>
+        <td>${b.active_days}</td>
+        <td style="color:${hr>=2?'#991B1B':hr>=1?'#7A5500':'var(--g700)'};font-weight:700">${hr}</td>
+        <td>${badge}</td></tr>`;
+    }).join('');
+    document.getElementById('riskTableWrap').innerHTML=`<table>
+      <thead><tr><th>Business UIN</th><th>Risiti</th><th>Wastani</th><th>Kiwango Juu</th><th>Siku</th><th>High Risk</th><th>Hali</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  }catch(e){
+    document.getElementById('riskTableWrap').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div><p>Hitilafu: ${e.message}</p></div>`;
+  }
+}
+
+function renderChainRecords(){
+  const el=document.getElementById('chainRecordsList');
+  if(!blockchainRecords.length){
+    el.innerHTML='<div class="empty-state card" style="padding:40px 20px"><div class="ei">⛓️</div><p>Hakuna rekodi za blockchain katika kipindi hiki.<br>No blockchain records this session yet.<br><br>Go to <strong>Tuma Risiti</strong> → issue a receipt → click <strong>Hifadhi kwenye Avalanche Fuji</strong></p></div>';
+    return;
+  }
+  el.innerHTML=blockchainRecords.map(r=>`
+    <div class="chain-rec">
+      <div class="chain-rec-head">
+        <span class="chain-rec-id">${r.receiptId}</span>
+        <span class="chain-rec-block">Block ${r.block}</span>
+      </div>
+      <div class="chain-rec-chips">
+        <span class="chain-rec-chip">UIN: ${r.uin}</span>
+        <span class="chain-rec-chip">TZS ${r.amount}</span>
+        <span class="chain-rec-chip">${r.cat}</span>
+        <span class="chain-rec-chip">🕐 ${r.eatTime}</span>
+      </div>
+      <a class="chain-rec-link" href="${r.snowtrace}" target="_blank">🔗 View on SnowTrace — TX: ${r.txHash.substring(0,18)}... ↗</a>
+    </div>`).join('');
+}
+
+async function verifyManual(){
+  const id=document.getElementById('verifyInput').value.trim();
+  if(!id){alert('Ingiza nambari ya risiti');return;}
+  const btn=document.getElementById('verifyBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Inathibitisha...';
+  document.getElementById('verifyResult').innerHTML='<div class="empty-state"><div class="ei">⏳</div><p>Inathibitisha kwenye blockchain...</p></div>';
+  try{
+    const resp=await fetch(API+'/verify/'+encodeURIComponent(id));
+    const data=await resp.json();
+    if(data.verified){
+      const eatTime=toEAT(data.timestamp);
+      document.getElementById('verifyResult').innerHTML=`
+        <div class="v-result" style="border-top:4px solid var(--g500)">
+          <div class="v-stamp" style="background:var(--g100)">
+            <div class="v-icon">✅</div>
+            <div class="v-title" style="color:var(--g700)">IMETHIBITISHWA</div>
+            <div class="v-sub">AUTHENTIC &amp; BLOCKCHAIN-VERIFIED<br>Risiti hii ni ya kweli na imehifadhiwa kwenye blockchain</div>
+          </div>
+          <div class="v-body">
+            <div class="v-row"><span class="v-lbl">Receipt ID</span><span class="v-val" style="font-family:monospace;font-size:11px">${data.receipt_id}</span></div>
+            <div class="v-row"><span class="v-lbl">Business UIN</span><span class="v-val">${data.business_uin}</span></div>
+            <div class="v-row"><span class="v-lbl">Amount (TZS)</span><span class="v-val" style="color:var(--g700);font-weight:800;font-size:15px">TZS ${Number(data.amount_tzs).toLocaleString()}</span></div>
+            <div class="v-row"><span class="v-lbl">Muda (EAT)</span><span class="v-val"><span class="eat-badge">🕐 ${eatTime}</span></span></div>
+            <div class="bk-label-row" style="margin-top:12px">SHA-256 Hash</div>
+            <div class="hash-box">${data.receipt_hash||'—'}</div>
+          </div>
+        </div>`;
+    }else{
+      document.getElementById('verifyResult').innerHTML=`
+        <div class="v-result" style="border-top:4px solid #991B1B">
+          <div class="v-stamp" style="background:#FEF2F2">
+            <div class="v-icon">🚫</div>
+            <div class="v-title" style="color:#991B1B">HAIJAKUBALIWA</div>
+            <div class="v-sub">NOT FOUND ON BLOCKCHAIN<br>Risiti hii haikupatikana kwenye rekodi za blockchain</div>
+          </div>
+          <div class="v-body">
+            <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:12px;font-size:12px;color:#7F1D1D;line-height:1.7">
+              ⚠️ Risiti hii haipo kwenye blockchain. Inaweza kuwa ya uongo au bado haijathibitishwa.
+            </div>
+          </div>
+        </div>`;
+    }
+  }catch(e){
+    document.getElementById('verifyResult').innerHTML=`<div class="empty-state"><div class="ei">⚠️</div><p>Hitilafu: ${e.message}<br>Hakikisha Flask inafanya kazi</p></div>`;
+  }
+  btn.disabled=false;btn.innerHTML='🔍 Thibitisha kwenye Blockchain →';
+}
+</script>
+</body>
+</html>
