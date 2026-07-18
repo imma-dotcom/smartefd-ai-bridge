@@ -1,4 +1,5 @@
 # app.py  —  COMPLETE FILE WITH ALL ROUTES
+import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from receipt import create_receipt
@@ -96,10 +97,9 @@ def get_summary():
 def verify_receipt(receipt_id):
     result = verify_receipt_onchain(receipt_id)
     return jsonify(result), 200
+    
 
 # ── Start server ───────────────────────────────────────
-if __name__ == "__main__":
-    print("\n  SmartEFD AI Bridge — API Server Starting...")
-    print("  Local  : http://localhost:5000")
-    print("  Network: run 'ipconfig' and use your IPv4 address\n")
-    app.run(debug=True, port=5000, host="0.0.0.0")
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
