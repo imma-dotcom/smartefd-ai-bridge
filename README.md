@@ -94,6 +94,16 @@ smartefd-backend/data/
 | GET | `/verify/<receipt_id>` | Blockchain verification |
 
 ---
+## UI Design
+
+The frontend follows Apple Human Interface Guidelines principles:
+- Minimalist white surface design with TRA green (#005C2B) accent
+- Mobile-first: bottom tab bar on mobile, header navigation on desktop
+- Bilingual Swahili/English with stacked label hierarchy
+- Touch-friendly: all inputs 48px minimum height, 16px font-size
+- SVG Feather Icons throughout — no emojis
+- Public QR verification via `verify.html`
+
 
 ## 👨‍💻 Developer
 
