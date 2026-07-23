@@ -3,402 +3,665 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thibitisha Risiti — SmartEFD TRA</title>
+<title>Thibitisha Risiti — SmartEFD AI Bridge</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+/* ── DESIGN TOKENS (matches index.html exactly) ────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --g900:#003D1A;--g700:#005C2B;--g500:#007A38;--g200:#A8D5B8;--g100:#E8F5EE;
-  --b900:#002060;--b700:#003580;--b100:#E8F0FB;
-  --gold:#FFB81C;--white:#FFFFFF;
-  --text:#1A2E1A;--muted:#4A6B50;--border:#C8E0D0;
-  --red:#991B1B;--red-bg:#FEF2F2;--red-border:#FECACA;
+  --bg:       #F5F5F7;
+  --surface:  #FFFFFF;
+  --border:   rgba(0,0,0,0.08);
+  --border-mid:rgba(0,0,0,0.12);
+  --t1:       #1D1D1F;
+  --t2:       #424245;
+  --t3:       #6E6E73;
+  --accent:   #005C2B;
+  --accent-h: #004422;
+  --accent-lt:rgba(0,92,43,0.08);
+  --chain:    #003580;
+  --chain-lt: rgba(0,53,128,0.07);
+  --ok:       #34C759;
+  --ok-bg:    #F0FDF4;
+  --ok-text:  #065F46;
+  --err:      #FF3B30;
+  --err-bg:   #FEF2F2;
+  --err-text: #7F1D1D;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04),0 2px 6px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04);
+  --r:        12px;
+  --r-sm:     8px;
+  --r-pill:   100px;
+  --font:     -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  --mono:     "SF Mono","Fira Code",Consolas,monospace;
 }
-body{background:#F0F4F1;color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif;min-height:100vh;font-size:14px}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{
+  font-family:var(--font);background:var(--bg);
+  color:var(--t1);line-height:1.5;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+svg{display:block;flex-shrink:0}
+a{color:inherit;text-decoration:none}
 
-/* GOV BAR */
-.gov-bar{background:var(--g900);padding:5px 24px;display:flex;align-items:center;gap:10px}
-.gov-bar span{font-size:10px;color:var(--g200);letter-spacing:.5px}
+/* ── HEADER ────────────────────────────────────────── */
+.site-header{
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:0.5px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:720px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;
+  justify-content:space-between;height:56px;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:16px;font-weight:700;letter-spacing:-.4px;color:var(--t1)}
+.brand-sub{font-size:11px;color:var(--t3);letter-spacing:.1px}
+.back-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  background:var(--bg);border:0.5px solid var(--border-mid);
+  border-radius:var(--r-pill);
+  font-size:13px;font-weight:500;color:var(--t2);
+  cursor:pointer;transition:background .15s;
+  text-decoration:none;white-space:nowrap;
+}
+.back-btn:hover{background:#E8E8ED;color:var(--t1)}
+.back-btn svg{color:var(--t2)}
 
-/* HEADER */
-.hdr{
-  background:linear-gradient(135deg,var(--g700) 0%,var(--b900) 100%);
-  border-bottom:4px solid var(--gold);padding:14px 24px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.hdr-logo{display:flex;align-items:center;gap:14px}
-.logo-em{
-  width:48px;height:48px;border-radius:50%;background:var(--gold);
-  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
-}
-.hdr-text h1{font-size:16px;font-weight:800;color:#fff}
-.hdr-text .sub{font-size:10px;color:var(--g200);letter-spacing:1px;margin-top:2px}
-.hdr-back{
-  font-size:11px;color:rgba(255,255,255,.7);text-decoration:none;
-  border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:5px 12px;
-  transition:background .15s;
-}
-.hdr-back:hover{background:rgba(255,255,255,.1);color:#fff}
+/* ── MAIN ──────────────────────────────────────────── */
+main{flex:1;padding:36px 0 48px}
+.container{max-width:720px;margin:0 auto;padding:0 24px}
 
-/* MAIN */
-.wrap{max-width:680px;margin:32px auto;padding:0 20px}
+/* ── PAGE HEADER ───────────────────────────────────── */
+.page-head{margin-bottom:28px}
+.page-title{font-size:26px;font-weight:700;letter-spacing:-.5px;color:var(--t1);margin-bottom:4px}
+.page-sub{font-size:15px;color:var(--t3)}
 
-/* LOADING */
-.loading{
-  text-align:center;padding:60px 20px;
-  background:var(--white);border-radius:12px;border:1px solid var(--border);
+/* ── CARD ──────────────────────────────────────────── */
+.card{
+  background:var(--surface);border-radius:var(--r);
+  border:0.5px solid var(--border);
+  box-shadow:var(--shadow-sm);overflow:hidden;
 }
-.spin{
-  display:inline-block;width:40px;height:40px;
-  border:4px solid var(--g200);border-top-color:var(--g700);
-  border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px;
+.card-body{padding:24px}
+.card-label{
+  font-size:11px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--t3);
+  margin-bottom:20px;display:flex;align-items:center;gap:7px;
+}
+
+/* ── MANUAL FORM ───────────────────────────────────── */
+.field{margin-bottom:14px}
+.field-label{display:block;margin-bottom:8px}
+.label-en{display:block;font-size:14px;font-weight:600;color:var(--t1);line-height:1.3}
+.label-sw{display:block;font-size:.85rem;font-weight:400;color:var(--t3);margin-top:2px;line-height:1.3}
+.field-input{
+  width:100%;background:var(--bg);border:none;
+  border-radius:var(--r-sm);padding:12px 14px;
+  font-size:16px;color:var(--t1);
+  min-height:48px;font-family:var(--font);
+  outline:none;transition:background .15s,box-shadow .15s;
+  -webkit-appearance:none;appearance:none;
+}
+.field-input:focus{
+  background:var(--surface);
+  box-shadow:0 0 0 3px rgba(0,92,43,.12),inset 0 0 0 1.5px var(--accent);
+}
+.btn-primary{
+  width:100%;padding:13px 20px;min-height:48px;
+  background:var(--accent);color:white;border:none;
+  border-radius:var(--r-sm);font-size:15px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;letter-spacing:-.15px;
+  transition:background .15s,transform .1s,opacity .15s;
+  font-family:var(--font);
+}
+.btn-primary:hover{background:var(--accent-h)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.42;cursor:not-allowed;transform:none}
+
+/* ── LOADING STATE ─────────────────────────────────── */
+.loading-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 24px;text-align:center;
+}
+.pulse-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:3px solid var(--bg);
+  border-top:3px solid var(--accent);
+  animation:spin .8s linear infinite;
+  margin-bottom:20px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading p{color:var(--muted);font-size:13px;line-height:1.7}
-
-/* RESULT CARD */
-.result-card{
-  background:var(--white);border-radius:12px;
-  border:1px solid var(--border);overflow:hidden;
-  box-shadow:0 2px 12px rgba(0,0,0,.08);
+.loading-title{font-size:17px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.loading-sub{font-size:13px;color:var(--t3);line-height:1.6;max-width:280px}
+.loading-receipt{
+  font-family:var(--mono);font-size:10px;color:var(--accent);
+  background:var(--accent-lt);padding:4px 12px;border-radius:var(--r-pill);
+  margin-top:14px;word-break:break-all;max-width:360px;line-height:1.5;
 }
 
-/* STAMP HEADER */
+/* ── RESULT CARD — AUTHENTIC ───────────────────────── */
+.result-card{margin-top:0}
+
 .stamp-header{
-  padding:28px 24px;text-align:center;
-  border-bottom:2px solid var(--border);
+  padding:32px 24px;text-align:center;
+  border-bottom:0.5px solid var(--border);
 }
-.stamp-icon{font-size:56px;margin-bottom:12px;display:block}
-.stamp-title{font-size:22px;font-weight:900;margin-bottom:4px}
-.stamp-sub{font-size:12px;margin-top:6px;color:var(--muted)}
+.stamp-icon-wrap{
+  width:64px;height:64px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+}
+.stamp-title{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.stamp-subtitle{font-size:14px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-bottom:6px}
+.stamp-desc{font-size:13px;color:var(--t3);line-height:1.6;max-width:380px;margin:0 auto}
 
-/* AUTHENTIC */
-.authentic .stamp-header{background:var(--g100)}
-.authentic .stamp-title{color:var(--g700)}
+.authentic .stamp-header{background:var(--ok-bg)}
+.authentic .stamp-title{color:var(--ok-text)}
+.authentic .stamp-subtitle{color:#16A34A}
+.not-found .stamp-header{background:var(--err-bg)}
+.not-found .stamp-title{color:var(--err-text)}
+.not-found .stamp-subtitle{color:#DC2626}
 
-/* NOT AUTHENTIC */
-.not-auth .stamp-header{background:var(--red-bg)}
-.not-auth .stamp-title{color:var(--red)}
-
-/* DETAILS */
-.details{padding:22px 24px}
+/* ── RECEIPT DETAILS ───────────────────────────────── */
+.details-section{padding:20px 24px}
 .section-label{
-  font-size:9px;font-weight:800;color:var(--muted);
-  letter-spacing:1.5px;text-transform:uppercase;
+  font-size:11px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--t3);
   margin-bottom:12px;padding-bottom:8px;
-  border-bottom:2px solid var(--g100);
+  border-bottom:0.5px solid var(--border);
+  display:flex;align-items:center;gap:7px;
 }
 .detail-row{
-  display:flex;justify-content:space-between;
-  align-items:flex-start;gap:12px;
-  padding:9px 0;border-bottom:1px solid #F0F4F1;font-size:13px;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:10px 0;border-bottom:0.5px solid var(--border);
+  font-size:13px;gap:16px;
 }
 .detail-row:last-child{border-bottom:none}
-.detail-label{color:var(--muted);flex-shrink:0;font-size:12px}
-.detail-value{
-  color:var(--text);font-weight:600;text-align:right;
-  word-break:break-all;font-size:12px;
-}
-.detail-value.mono{font-family:'Courier New',monospace;font-size:10px;color:var(--g700)}
-
-/* BLOCKCHAIN BLOCK */
-.chain-block{
-  margin:18px 24px;background:var(--b100);
-  border:1px solid var(--b700);border-radius:8px;padding:14px 16px;
-}
-.chain-block-title{
-  font-size:10px;font-weight:800;color:var(--b700);
-  letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;
-}
-.chain-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}
-.chain-label{color:var(--b700);opacity:.8}
-.chain-value{color:var(--b900);font-weight:700;font-family:'Courier New',monospace;font-size:10px}
-.chain-link{color:var(--b700);text-decoration:none;font-weight:700;font-size:11px}
-.chain-link:hover{text-decoration:underline}
-
-/* EAT BADGE */
-.eat-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--g700);color:#fff;
-  border-radius:4px;padding:4px 10px;
-  font-size:11px;font-weight:700;font-family:'Courier New',monospace;
+.detail-label{color:var(--t3);flex-shrink:0}
+.detail-value{color:var(--t1);font-weight:600;text-align:right;word-break:break-all}
+.detail-value.mono{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.detail-value.amount{font-size:17px;font-weight:800;color:var(--accent)}
+.eat-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent);color:white;
+  border-radius:var(--r-sm);padding:3px 11px;
+  font-family:var(--mono);font-size:11px;font-weight:600;
 }
 
-/* HASH DISPLAY */
+/* ── HASH BOX ──────────────────────────────────────── */
+.hash-section{padding:0 24px 20px}
 .hash-box{
-  background:#F8FAF9;border:1px solid var(--g200);border-radius:6px;
-  padding:10px 12px;font-family:'Courier New',monospace;font-size:10px;
-  color:var(--muted);word-break:break-all;line-height:1.6;
-  margin-bottom:8px;
+  background:var(--bg);border-radius:var(--r-sm);
+  padding:12px 14px;
+  font-family:var(--mono);font-size:10.5px;
+  color:var(--t3);word-break:break-all;line-height:1.65;
+}
+.hash-note{font-size:11px;color:var(--t3);line-height:1.55;margin-top:8px}
+
+/* ── BLOCKCHAIN SECTION ────────────────────────────── */
+.chain-section{
+  background:var(--chain-lt);border-top:0.5px solid var(--border);
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;
+}
+.chain-detail{flex:1}
+.chain-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--chain);opacity:.7;margin-bottom:4px}
+.chain-value{font-size:13px;font-weight:600;color:var(--chain)}
+.chain-link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;
+  background:var(--chain);color:white;
+  border-radius:var(--r-sm);
+  font-size:12px;font-weight:600;
+  transition:opacity .15s;white-space:nowrap;
+}
+.chain-link:hover{opacity:.88}
+.chain-link svg{flex-shrink:0}
+
+/* ── NOT FOUND WARNING ─────────────────────────────── */
+.warn-section{padding:20px 24px}
+.warn-box{
+  background:var(--err-bg);border:1px solid #FECACA;
+  border-radius:var(--r-sm);padding:14px 16px;
+}
+.warn-box-title{font-size:13px;font-weight:700;color:var(--err-text);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.warn-box-body{font-size:12px;color:#7F1D1D;line-height:1.7}
+.report-row{
+  padding:16px 24px;border-top:0.5px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.report-text{font-size:12px;color:var(--t3);line-height:1.5}
+.report-link{
+  font-size:12px;font-weight:600;color:var(--chain);
+  display:inline-flex;align-items:center;gap:4px;
 }
 
-/* FOOTER */
-.verify-footer{
-  background:var(--g50);border-top:2px solid var(--g200);
-  padding:14px 24px;text-align:center;
-  font-size:10px;color:var(--muted);
+/* ── SCAN ANOTHER ──────────────────────────────────── */
+.scan-another{margin-top:16px}
+.btn-outline{
+  width:100%;padding:12px 20px;min-height:48px;
+  background:transparent;border:1.5px solid var(--border-mid);
+  border-radius:var(--r-sm);color:var(--t2);
+  font-size:14px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background .15s,border-color .15s;font-family:var(--font);
 }
-.verify-footer strong{color:var(--g700)}
+.btn-outline:hover{background:var(--bg);border-color:var(--accent);color:var(--accent)}
 
-/* ERROR CARD */
-.error-card{
-  background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;
-  padding:32px 24px;text-align:center;
+/* ── EMPTY (no ID in URL) ──────────────────────────── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:52px 24px;text-align:center;
 }
-.error-icon{font-size:40px;margin-bottom:12px}
-.error-title{font-size:18px;font-weight:800;color:var(--red);margin-bottom:8px}
-.error-msg{font-size:12px;color:#7F1D1D;line-height:1.7}
+.empty-icon{
+  width:56px;height:56px;background:var(--bg);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:16px;color:var(--t3);
+}
+.empty-title{font-size:17px;font-weight:600;color:var(--t1);margin-bottom:5px}
+.empty-body{font-size:13px;color:var(--t3);line-height:1.55;max-width:280px}
 
-/* FOOTER GLOBAL */
-.footer{background:var(--g900);color:var(--g200);text-align:center;padding:12px;font-size:10px;margin-top:24px}
-.footer strong{color:var(--gold)}
+/* ── SPINNER ───────────────────────────────────────── */
+.spin{
+  display:inline-flex;width:14px;height:14px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:currentColor;border-radius:50%;
+  animation:spin .75s linear infinite;
+}
+
+/* ── FOOTER ────────────────────────────────────────── */
+.site-footer{
+  border-top:0.5px solid var(--border);
+  background:var(--surface);padding:16px 0;margin-top:auto;
+}
+.footer-legal{
+  max-width:720px;margin:0 auto;padding:0 24px;
+  text-align:center;font-size:11px;color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;flex-wrap:wrap;
+}
+.footer-legal .sep{opacity:.4}
+
+/* ── RESPONSIVE ────────────────────────────────────── */
+@media(max-width:480px){
+  .chain-section{flex-direction:column;align-items:flex-start}
+  .stamp-title{font-size:20px}
+}
 </style>
 </head>
 <body>
 
-<!-- GOV BAR -->
-<div class="gov-bar">
-  <span>🇹🇿</span>
-  <span>JAMHURI YA MUUNGANO WA TANZANIA · UNITED REPUBLIC OF TANZANIA</span>
-</div>
-
 <!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-logo">
-    <div class="logo-em">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <line x1="16" y1="4" x2="16" y2="28" stroke="white" stroke-width="2.2"/>
-        <line x1="8"  y1="28" x2="24" y2="28" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
-        <line x1="16" y1="10" x2="6"  y2="14" stroke="white" stroke-width="2"/>
-        <line x1="16" y1="10" x2="26" y2="14" stroke="white" stroke-width="2"/>
-        <path d="M3 14 Q6 21 9 14"    fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
-        <path d="M23 14 Q26 21 29 14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="16" cy="8" r="2.8" fill="white"/>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round">
+          <line x1="16" y1="4" x2="16" y2="28"/>
+          <line x1="8" y1="28" x2="24" y2="28"/>
+          <line x1="16" y1="10" x2="6" y2="14"/>
+          <line x1="16" y1="10" x2="26" y2="14"/>
+          <path d="M3 14 Q6 21 9 14" fill="none"/>
+          <path d="M23 14 Q26 21 29 14" fill="none"/>
+          <circle cx="16" cy="7.5" r="2.2" fill="white" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">SmartEFD AI Bridge</div>
+        <div class="brand-sub">Tanzania Revenue Authority</div>
+      </div>
+    </div>
+    <a href="/" class="back-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
       </svg>
-    </div>
-    <div class="hdr-text">
-      <h1>Thibitisha Risiti / Verify Receipt</h1>
-      <div class="sub">MAMLAKA YA MAPATO TANZANIA — SMARTEFD AI BRIDGE</div>
-    </div>
+      Back
+    </a>
   </div>
-  <a href="index.html" class="hdr-back">← Rudi / Back</a>
-</div>
+</header>
 
 <!-- MAIN -->
-<div class="wrap">
+<main>
+<div class="container">
 
-  <!-- Loading state -->
-  <div class="loading" id="loading">
-    <div class="spin"></div>
-    <p>
-      Inathibitisha risiti kwenye blockchain...<br>
-      <span style="color:var(--g700);font-weight:700">Verifying receipt on Avalanche Fuji Testnet...</span>
-    </p>
+  <div class="page-head">
+    <h1 class="page-title">Verify Receipt</h1>
+    <p class="page-sub">Thibitisha Risiti &mdash; confirm authenticity on Avalanche blockchain</p>
   </div>
 
-  <!-- Result (filled by JS) -->
-  <div id="resultArea" style="display:none"></div>
-
-  <!-- Error -->
-  <div class="error-card" id="errorArea" style="display:none">
-    <div class="error-icon">⚠️</div>
-    <div class="error-title">Hitilafu ya Mtandao</div>
-    <div class="error-msg" id="errorMsg">
-      Haikuweza kuunganika na API.<br>
-      Hakikisha Flask inafanya kazi: <strong>python app.py</strong><br><br>
-      Could not connect to API. Make sure Flask is running.
+  <!-- MANUAL INPUT (shown when no ID in URL, or after result) -->
+  <div class="card" id="manualCard">
+    <div class="card-body">
+      <div class="card-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Thibitisha Risiti / Verify Receipt
+      </div>
+      <div class="field">
+        <label class="field-label" for="receiptInput">
+          <span class="label-en">Receipt ID</span>
+          <span class="label-sw">Nambari ya Risiti</span>
+        </label>
+        <input
+          id="receiptInput"
+          class="field-input"
+          type="text"
+          placeholder="EFD-TZ-1783758566811"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+      </div>
+      <button class="btn-primary" id="verifyBtn" onclick="runVerify()">
+        Verify on Blockchain
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
     </div>
   </div>
 
+  <!-- LOADING -->
+  <div id="loadingState" style="display:none" class="card" style="margin-top:16px">
+    <div class="loading-state">
+      <div class="pulse-ring"></div>
+      <div class="loading-title">Inathibitisha kwenye Blockchain...</div>
+      <div class="loading-sub">Querying Avalanche Fuji Testnet &mdash; this takes 2&ndash;5 seconds</div>
+      <div class="loading-receipt" id="loadingId"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultArea" style="margin-top:16px"></div>
+
 </div>
+</main>
 
 <!-- FOOTER -->
-<div class="footer">
-  <strong>SmartEFD AI Bridge</strong> · Mamlaka ya Mapato Tanzania (TRA) ·
-  Avalanche C-Chain · Innovation Challenge 2026 · <strong>tra.go.tz</strong>
-</div>
+<footer class="site-footer">
+  <div class="footer-legal">
+    <span>SmartEFD AI Bridge</span>
+    <span class="sep">&middot;</span>
+    <span>Mamlaka ya Mapato Tanzania</span>
+    <span class="sep">&middot;</span>
+    <span>Innovation Challenge 2026</span>
+    <span class="sep">&middot;</span>
+    <span>tra.go.tz</span>
+  </div>
+</footer>
 
 <script>
-const API = 'http://localhost:5000';
+// ── DYNAMIC API — works on Render, Firebase, and localhost ──
+const API = window.location.origin;
 
-/* ── EAT TIME CONVERTER ── */
+// ── EAT TIME CONVERTER (UTC + 3) ─────────────────────
 function toEAT(unixTs) {
   const ms  = unixTs ? unixTs * 1000 : Date.now();
-  const eat = new Date(ms + 3 * 60 * 60 * 1000);
+  const eat = new Date(ms + 3 * 3600 * 1000);
   const p   = n => String(n).padStart(2,'0');
   const days = ['Jumapili','Jumatatu','Jumanne','Jumatano','Alhamisi','Ijumaa','Jumamosi'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${eat.getUTCDate()} ${months[eat.getUTCMonth()]} ${eat.getUTCFullYear()} ` +
-         `${p(eat.getUTCHours())}:${p(eat.getUTCMinutes())}:${p(eat.getUTCSeconds())} EAT ` +
-         `(${days[eat.getUTCDay()]})`;
+  return `${eat.getUTCDate()} ${months[eat.getUTCMonth()]} ${eat.getUTCFullYear()} `
+       + `${p(eat.getUTCHours())}:${p(eat.getUTCMinutes())}:${p(eat.getUTCSeconds())} EAT `
+       + `(${days[eat.getUTCDay()]})`;
 }
 
-/* ── GET RECEIPT ID FROM URL ── */
-const params     = new URLSearchParams(window.location.search);
-const receiptId  = params.get('id');
+// ── READ ?id= FROM URL ────────────────────────────────
+const params    = new URLSearchParams(window.location.search);
+const urlId     = params.get('id');
 
-if (!receiptId) {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('errorArea').style.display = 'block';
-  document.getElementById('errorMsg').innerHTML =
-    'Hakuna nambari ya risiti katika URL.<br>No receipt ID in the URL.<br><br>' +
-    'Format: <strong>verify.html?id=EFD-TZ-XXXX</strong>';
-} else {
-  verifyReceipt(receiptId);
+// Auto-verify if ID is in the URL
+if (urlId) {
+  document.getElementById('receiptInput').value = urlId;
+  document.getElementById('manualCard').style.display = 'none';
+  verify(urlId);
 }
 
-/* ── VERIFY RECEIPT ── */
-async function verifyReceipt(id) {
+// ── BUTTON CLICK ──────────────────────────────────────
+function runVerify() {
+  const id = document.getElementById('receiptInput').value.trim();
+  if (!id) {
+    document.getElementById('receiptInput').focus();
+    return;
+  }
+  // Update URL without reload so link is shareable
+  history.replaceState(null,'',`?id=${encodeURIComponent(id)}`);
+  document.getElementById('manualCard').style.display = 'none';
+  verify(id);
+}
+
+// Allow Enter key in input
+document.getElementById('receiptInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') runVerify();
+});
+
+// ── MAIN VERIFY FUNCTION ──────────────────────────────
+async function verify(id) {
+  const area = document.getElementById('resultArea');
+
+  // Show loading
+  document.getElementById('loadingId').textContent = id;
+  document.getElementById('loadingState').style.display = 'block';
+  area.innerHTML = '';
+
   try {
     const resp = await fetch(`${API}/verify/${encodeURIComponent(id)}`);
     const data = await resp.json();
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('resultArea').style.display = 'block';
+    document.getElementById('loadingState').style.display = 'none';
 
     if (data.verified) {
-      renderAuthentic(data);
+      renderAuthentic(data, id);
     } else {
-      renderNotAuthentic(id, data);
+      renderNotFound(id);
     }
   } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('errorArea').style.display = 'block';
-    document.getElementById('errorMsg').innerHTML =
-      `Hitilafu: ${e.message}<br><br>
-       Make sure Flask is running: <strong>python app.py</strong>`;
+    document.getElementById('loadingState').style.display = 'none';
+    renderError(e.message);
   }
 }
 
-/* ── RENDER AUTHENTIC ── */
-function renderAuthentic(data) {
-  const eatTime   = toEAT(data.timestamp);
-  const shortHash = data.receipt_hash
-    ? data.receipt_hash.substring(0,10) + '...' + data.receipt_hash.slice(-8)
-    : '—';
-  const snowUrl   = data.tx_hash
+// ── RENDER AUTHENTIC ──────────────────────────────────
+function renderAuthentic(data, id) {
+  const eatTime    = toEAT(data.timestamp);
+  const shortHash  = data.receipt_hash
+    ? data.receipt_hash.substring(0,12) + '...' + data.receipt_hash.slice(-10)
+    : '--';
+  const snowUrl    = data.tx_hash
     ? `https://testnet.snowtrace.io/tx/${data.tx_hash}`
     : `https://testnet.snowtrace.io/address/0x8F241Ab76e7aAB7B4D10711E9fEB650EC8c41f7F`;
 
   document.getElementById('resultArea').innerHTML = `
-    <div class="result-card authentic">
+    <div class="card result-card authentic">
 
+      <!-- Stamp -->
       <div class="stamp-header">
-        <span class="stamp-icon">✅</span>
+        <div class="stamp-icon-wrap" style="background:#D1FAE5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#065F46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
         <div class="stamp-title">IMETHIBITISHWA</div>
-        <div style="font-size:15px;font-weight:700;color:var(--g500);margin-top:2px">AUTHENTIC &amp; BLOCKCHAIN-VERIFIED</div>
-        <div class="stamp-sub">
-          Risiti hii imethibitishwa kwenye Avalanche Fuji Testnet<br>
-          This receipt is genuine and permanently recorded on blockchain
+        <div class="stamp-subtitle">Authentic &amp; Blockchain-Verified</div>
+        <div class="stamp-desc">
+          Risiti hii ni ya kweli na imehifadhiwa kudumu kwenye blockchain.<br>
+          This receipt is genuine and permanently recorded.
         </div>
       </div>
 
-      <div class="details">
-
-        <div class="section-label">Maelezo ya Risiti / Receipt Details</div>
-        <div class="detail-row">
-          <span class="detail-label">Nambari ya Risiti / Receipt ID</span>
-          <span class="detail-value mono">${escHtml(data.receipt_id || '—')}</span>
+      <!-- Receipt Details -->
+      <div class="details-section">
+        <div class="section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Maelezo ya Risiti / Receipt Details
         </div>
         <div class="detail-row">
-          <span class="detail-label">Biashara / Business UIN</span>
-          <span class="detail-value">${escHtml(data.business_uin || '—')}</span>
+          <span class="detail-label">Receipt ID</span>
+          <span class="detail-value mono">${esc(data.receipt_id || id)}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Kiasi / Amount (TZS)</span>
-          <span class="detail-value" style="color:var(--g700);font-size:15px;font-weight:800">
-            TZS ${Number(data.amount_tzs || 0).toLocaleString()}
-          </span>
+          <span class="detail-label">Business UIN</span>
+          <span class="detail-value">${esc(data.business_uin || '--')}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Muda (EAT) / Time</span>
-          <span class="detail-value">
-            <span class="eat-badge">🕐 ${eatTime}</span>
-          </span>
+          <span class="detail-label">Amount (TZS)</span>
+          <span class="detail-value amount">TZS ${Number(data.amount_tzs||0).toLocaleString()}</span>
         </div>
-
-        <div class="section-label" style="margin-top:18px">Alama ya Kriptografia / Cryptographic Hash</div>
-        <div class="hash-box">${escHtml(data.receipt_hash || '—')}</div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.6">
-          SHA-256 fingerprint ya risiti hii imehifadhiwa kwenye blockchain.<br>
-          Any change to the receipt data would produce a completely different hash.
-        </div>
-
-      </div>
-
-      <div class="chain-block">
-        <div class="chain-block-title">⛓️ Rekodi ya Blockchain / Blockchain Record</div>
-        <div class="chain-row">
-          <span class="chain-label">Network</span>
-          <span class="chain-value">Avalanche Fuji Testnet (Chain ID 43113)</span>
-        </div>
-        <div class="chain-row">
-          <span class="chain-label">Contract</span>
-          <span class="chain-value">0x8F241Ab...41f7F</span>
-        </div>
-        <div class="chain-row">
-          <span class="chain-label">Hash (short)</span>
-          <span class="chain-value">${shortHash}</span>
-        </div>
-        <div style="margin-top:10px">
-          <a class="chain-link" href="${snowUrl}" target="_blank">
-            🔗 Angalia kwenye SnowTrace Explorer ↗
-          </a>
+        <div class="detail-row">
+          <span class="detail-label">Time (EAT)</span>
+          <span class="detail-value"><span class="eat-tag">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${eatTime}
+          </span></span>
         </div>
       </div>
 
-      <div class="verify-footer">
-        Verified by <strong>SmartEFD AI Bridge</strong> ·
-        Mamlaka ya Mapato Tanzania ·
-        Muda wa kuthibitisha: <strong>${toEAT(null)}</strong>
+      <!-- SHA-256 Hash -->
+      <div class="hash-section">
+        <div class="section-label" style="margin-bottom:10px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          SHA-256 Cryptographic Hash
+        </div>
+        <div class="hash-box">${esc(data.receipt_hash || '--')}</div>
+        <div class="hash-note">Any change to the original receipt data produces a completely different hash — making tampering detectable.</div>
       </div>
 
+      <!-- Blockchain Block -->
+      <div class="chain-section">
+        <div class="chain-detail">
+          <div class="chain-label">Network</div>
+          <div class="chain-value">Avalanche Fuji Testnet &nbsp;&middot;&nbsp; Chain ID 43113</div>
+        </div>
+        <div class="chain-detail">
+          <div class="chain-label">Hash (short)</div>
+          <div class="chain-value" style="font-family:var(--mono);font-size:11px">${shortHash}</div>
+        </div>
+        <a class="chain-link" href="${snowUrl}" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          SnowTrace
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Scan another -->
+    <div class="scan-another">
+      <button class="btn-outline" onclick="scanAnother()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Verify Another Receipt
+      </button>
     </div>
   `;
 }
 
-/* ── RENDER NOT AUTHENTIC ── */
-function renderNotAuthentic(id, data) {
+// ── RENDER NOT FOUND ──────────────────────────────────
+function renderNotFound(id) {
   document.getElementById('resultArea').innerHTML = `
-    <div class="result-card not-auth">
+    <div class="card result-card not-found">
 
       <div class="stamp-header">
-        <span class="stamp-icon">🚫</span>
+        <div class="stamp-icon-wrap" style="background:#FEE2E2">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7F1D1D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
         <div class="stamp-title">HAIJAKUBALIWA</div>
-        <div style="font-size:15px;font-weight:700;color:var(--red);margin-top:2px">NOT FOUND ON BLOCKCHAIN</div>
-        <div class="stamp-sub">
-          Risiti hii haikupatikana kwenye blockchain<br>
-          This receipt was not found in the blockchain record
+        <div class="stamp-subtitle">Not Found on Blockchain</div>
+        <div class="stamp-desc">
+          Risiti hii haikupatikana kwenye rekodi za blockchain.<br>
+          This receipt was not found in blockchain records.
         </div>
       </div>
 
-      <div class="details">
-        <div class="section-label">Nambari Iliyotafutwa / Receipt ID Searched</div>
-        <div class="hash-box">${escHtml(id)}</div>
-
-        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:12px 14px;margin-top:12px">
-          <div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:6px">
-            ⚠️ Tahadhari / Warning
+      <div class="warn-section">
+        <div class="warn-box">
+          <div class="warn-box-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Tahadhari / Warning
           </div>
-          <div style="font-size:12px;color:#7F1D1D;line-height:1.7">
-            Risiti hii haipo kwenye rekodi za blockchain.<br>
-            Hii inaweza kumaanisha risiti ni ya uongo au bado haijakamilishwa.<br><br>
-            This receipt was not found in blockchain records.
-            It may be fraudulent or has not yet been confirmed on-chain.
+          <div class="warn-box-body">
+            Receipt ID searched: <strong style="font-family:var(--mono);font-size:10px">${esc(id)}</strong><br><br>
+            This receipt may be fraudulent, or it may not yet have been confirmed on-chain by the issuing business.
+            If you received this receipt from a business and believe it should be valid, report it to TRA.
           </div>
-        </div>
-
-        <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.7;text-align:center">
-          Ripoti hali hii kwa TRA: <strong style="color:var(--g700)">tra.go.tz</strong><br>
-          Report this to TRA if you believe this receipt should be valid.
         </div>
       </div>
 
+      <div class="report-row">
+        <div class="report-text">
+          Report to TRA: <strong>tra.go.tz</strong><br>
+          TRA Helpline: <strong>0800 780 078</strong> (toll-free)
+        </div>
+        <a class="report-link" href="https://www.tra.go.tz" target="_blank" rel="noopener">
+          Visit TRA Website
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="scan-another">
+      <button class="btn-outline" onclick="scanAnother()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Try Another Receipt ID
+      </button>
     </div>
   `;
 }
 
-/* ── ESCAPE HTML ── */
-function escHtml(str){
+// ── RENDER ERROR ──────────────────────────────────────
+function renderError(msg) {
+  document.getElementById('resultArea').innerHTML = `
+    <div class="card">
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;align-items:center;padding:32px 0;text-align:center">
+          <div style="width:48px;height:48px;background:var(--bg);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--t3)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div style="font-size:16px;font-weight:600;color:var(--t1);margin-bottom:6px">Connection Error</div>
+          <div style="font-size:13px;color:var(--t3);line-height:1.6;max-width:280px;margin-bottom:4px">
+            Could not reach the SmartEFD API.
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg);padding:6px 12px;border-radius:var(--r-pill);margin-top:8px">
+            ${esc(msg)}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scan-another">
+      <button class="btn-outline" onclick="scanAnother()">Try Again</button>
+    </div>
+  `;
+}
+
+// ── SCAN ANOTHER ──────────────────────────────────────
+function scanAnother() {
+  document.getElementById('resultArea').innerHTML  = '';
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('manualCard').style.display   = 'block';
+  document.getElementById('receiptInput').value = '';
+  document.getElementById('receiptInput').focus();
+  history.replaceState(null, '', window.location.pathname);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ── HTML ESCAPE ───────────────────────────────────────
+function esc(str) {
   return String(str)
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
